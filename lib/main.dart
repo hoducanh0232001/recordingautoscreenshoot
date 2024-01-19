@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
-
 import 'package:ed_screen_recorder/ed_screen_recorder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-
-
-
 
 void main() {
   runApp(const MyApp());
@@ -55,7 +51,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     screenRecorder = EdScreenRecorder();
-
   }
 
   Future<void> startRecord({required String fileName}) async {
@@ -64,11 +59,13 @@ class _HomePageState extends State<HomePage> {
     print(tempPath);
     try {
       var startResponse = await screenRecorder?.startRecordScreen(
-        fileName: "Eren",
+        fileName: "NTTData",
         dirPathToSave: tempPath,
         audioEnable: true,
       );
-      timer = Timer.periodic(Duration(seconds: 5), (Timer t) => captureAndSaveScreenshot());
+      // start auto screenshot 5s
+      timer = Timer.periodic(
+          Duration(seconds: 5), (Timer t) => captureAndSaveScreenshot());
       setState(() {
         _response = startResponse;
       });
@@ -80,13 +77,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> captureAndSaveScreenshot() async {
-    // Chụp ảnh từ widget bên trong Screenshot
+    // widget in Screenshot
     try {
       Uint8List? capturedBytes = await screenshotController.capture();
 
       if (capturedBytes != null) {
         ui.Image capturedImage = await decodeImageFromList(capturedBytes);
-        await ImageGallerySaver.saveImage(capturedBytes, name: 'screenshot', quality: 100);
+        await ImageGallerySaver.saveImage(capturedBytes,
+            name: 'screenshot', quality: 100);
         print('Captured and saved screenshot.');
       } else {
         print('Capture failed: Image is null');
@@ -129,8 +127,10 @@ class _HomePageState extends State<HomePage> {
           : null;
     }
   }
+
   @override
   void dispose() {
+    //cancel time 5s auto screenshot
     timer?.cancel();
     super.dispose();
   }
@@ -145,7 +145,6 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 Text("File: ${(_response?['file'] as File?)?.path}"),
                 Text("Status: ${(_response?['success']).toString()}"),
                 Text("Event: ${_response?['eventname']}"),
@@ -155,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                 Text("Start Date: ${(_response?['startdate']).toString()}"),
                 Text("End Date: ${(_response?['enddate']).toString()}"),
                 ElevatedButton(
-                    onPressed: () => startRecord(fileName: "eren"),
+                    onPressed: () => startRecord(fileName: "nttdata"),
                     child: const Text('START RECORD')),
                 ElevatedButton(
                     onPressed: () => resumeRecord(),
@@ -170,7 +169,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-
       ),
     );
   }
