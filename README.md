@@ -5,6 +5,7 @@ A new Flutter project.
 ## Getting Started
 
 This project is a starting point for a Flutter application.
+Use for Android 13 and below and iOS device (Record inactive in iOS simulator)
 
 A few resources to get you started if this is your first Flutter project:
 
