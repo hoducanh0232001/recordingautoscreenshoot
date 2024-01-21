@@ -1,8 +1,13 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.CAPTURE_SCREEN"/>
+
     <application
         android:label="recordingautoscreenshoot"
         android:name="${applicationName}"
@@ -33,5 +38,18 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <service
+            android:name=".ScreenCaptureService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".ScreenCaptureReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.screen_capture.ACTION_CAPTURED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 </manifest>
