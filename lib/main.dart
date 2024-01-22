@@ -46,11 +46,48 @@ class _HomePageState extends State<HomePage> {
   EdScreenRecorder? screenRecorder;
   Map<String, dynamic>? _response;
   bool inProgress = false;
+  MethodChannel methodChannel = MethodChannel('your_channel_name');
 
   @override
   void initState() {
     super.initState();
     screenRecorder = EdScreenRecorder();
+
+    // Lắng nghe sự kiện khi có phương thức được gọi từ Kotlin
+    methodChannel.setMethodCallHandler((call) async {
+      print('call.method: ${call.method}');
+      if (call.method == 'your_method_name') {
+        // Nhận mảng byte từ native
+        List<int> byteArray = call.arguments.cast<int>();
+        Uint8List uint8List = Uint8List.fromList(byteArray);
+
+        // Chuyển đổi mảng byte thành Image
+        ui.Image capturedImage = await decodeImageFromList(uint8List);
+
+        // Lưu ảnh vào thư mục ảnh
+        await saveImageToGallery(capturedImage);
+      }
+    });
+
+  }
+  Future<void> saveImageToGallery(ui.Image image) async {
+    // Chuyển đổi Image thành mảng byte
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+    if (byteData != null) {
+      Uint8List uint8List = byteData.buffer.asUint8List();
+
+      // Lưu ảnh vào thư mục ảnh
+      final result = await ImageGallerySaver.saveImage(uint8List, name: 'screenshot', quality: 100);
+      print('aaaaaa: $result');
+      if (result['isSuccess']) {
+        print('Lưu ảnh thành công: ${result['filePath']}');
+      } else {
+        print('Lưu ảnh thất bại');
+      }
+    } else {
+      print('Chuyển đổi Image sang ByteData thất bại');
+    }
   }
 
   Future<void> startRecord({required String fileName}) async {
@@ -59,6 +96,8 @@ class _HomePageState extends State<HomePage> {
     print(tempPath);
     try {
       var startResponse = await screenRecorder?.startRecordScreen(
+        height: 300,
+        width: 250,
         fileName: "NTTData",
         dirPathToSave: tempPath,
         audioEnable: true,
@@ -91,6 +130,14 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print('Capture failed: $e');
+    }
+  }
+
+  void startScreenCapture() async {
+    try {
+      await MethodChannel('com.example.screen_capture').invokeMethod('startScreenCapture');
+    } catch (e) {
+      print('Error invoking startScreenCapture: $e');
     }
   }
 
